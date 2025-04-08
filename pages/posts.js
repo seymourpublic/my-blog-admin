@@ -26,7 +26,7 @@ const GET_POSTS = gql`
 `;
 
 export default function PostsPage() {
-  // We'll store filter criteria in this state object
+  // Store filter criteria in this state object
   const [filter, setFilter] = useState({});
 
   // Query the filtered posts
@@ -34,12 +34,12 @@ export default function PostsPage() {
     variables: { filter }
   });
 
-  // Whenever filter state changes, we refetch with the new filter
+  // Refetch posts whenever the filter state changes
   useEffect(() => {
     refetch({ filter });
   }, [filter, refetch]);
 
-  // For selecting posts (bulk actions)
+  // Track selected posts for bulk actions
   const [selectedPosts, setSelectedPosts] = useState([]);
 
   const toggleSelectPost = (postId) => {
@@ -58,35 +58,108 @@ export default function PostsPage() {
     }
   };
 
-  if (loading) return <Layout><p>Loading posts...</p></Layout>;
-  if (error) return <Layout><p>Error loading posts.</p></Layout>;
+  if (loading)
+    return (
+      <Layout>
+        <p style={styles.loadingText}>Loading posts...</p>
+      </Layout>
+    );
+  if (error)
+    return (
+      <Layout>
+        <p style={styles.errorText}>Error loading posts.</p>
+      </Layout>
+    );
 
   return (
     <Layout>
-      <h1>Posts Management</h1>
-      <Link href="/posts/new"><button>Create New Post</button></Link>
-
-      {/* Pass a function to FilterBar that updates our filter state */}
-      <FilterBar onFilter={(filters) => setFilter(filters)} />
-
-      <PostsTable
-        posts={data.filteredPosts}
-        selectedPosts={selectedPosts}
-        onBulkActionChange={handleBulkSelectChange}
-        toggleSelectPost={toggleSelectPost}
-      />
-
-      {selectedPosts.length > 0 && (
-        <div>
-          <p>{selectedPosts.length} posts selected</p>
-          <button onClick={() => { /* Implement bulk delete */ }}>
-            Delete Selected
-          </button>
-          <button onClick={() => { /* Implement bulk update */ }}>
-            Update Selected
-          </button>
+      <div style={styles.container}>
+        <h1 style={styles.heading}>Posts Management</h1>
+        <div style={styles.buttonGroup}>
+          <Link href="/posts/new" style={styles.link}>
+            <button style={styles.primaryButton}>Create New Post</button>
+          </Link>
         </div>
-      )}
+        <div style={styles.card}>
+          {/* Pass filter data from the FilterBar to update our filter state */}
+          <FilterBar onFilter={(filters) => setFilter(filters)} />
+        </div>
+        <div style={styles.card}>
+          <PostsTable
+            posts={data.filteredPosts}
+            selectedPosts={selectedPosts}
+            onBulkActionChange={handleBulkSelectChange}
+            toggleSelectPost={toggleSelectPost}
+          />
+        </div>
+        {selectedPosts.length > 0 && (
+          <div style={styles.bulkActions}>
+            <p>{selectedPosts.length} posts selected</p>
+            <button style={styles.bulkButton}>Delete Selected</button>
+            <button style={styles.bulkButton}>Update Selected</button>
+          </div>
+        )}
+      </div>
     </Layout>
   );
 }
+
+const styles = {
+  container: {
+    maxWidth: "1200px",
+    margin: "2rem auto",
+    padding: "1rem",
+    fontFamily: "sans-serif",
+    color: "#333"
+  },
+  heading: {
+    textAlign: "center",
+    fontSize: "2rem",
+    marginBottom: "1.5rem",
+    fontWeight: "600"
+  },
+  buttonGroup: {
+    textAlign: "right",
+    marginBottom: "1rem"
+  },
+  primaryButton: {
+    padding: "0.75rem 1.5rem",
+    backgroundColor: "#0070f3",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "1rem",
+    cursor: "pointer"
+  },
+  link: {
+    textDecoration: "none"
+  },
+  card: {
+    background: "#fff",
+    borderRadius: "8px",
+    padding: "1.5rem",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+    marginBottom: "2rem"
+  },
+  bulkActions: {
+    textAlign: "center",
+    marginTop: "1rem"
+  },
+  bulkButton: {
+    padding: "0.5rem 1rem",
+    backgroundColor: "#e00",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    margin: "0 0.5rem",
+    cursor: "pointer"
+  },
+  loadingText: {
+    textAlign: "center",
+    color: "#555"
+  },
+  errorText: {
+    textAlign: "center",
+    color: "red"
+  }
+};
