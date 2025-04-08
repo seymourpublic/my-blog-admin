@@ -17,6 +17,7 @@ export default function DashboardHome() {
           <Link href="/categories/new">
             <button>Create New Category</button>
           </Link>
+          
         </div>
       </div>
     </Layout>
