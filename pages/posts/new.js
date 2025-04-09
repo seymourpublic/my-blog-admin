@@ -1,3 +1,4 @@
+// pages/posts/new.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery, useMutation, gql } from '@apollo/client';
@@ -51,13 +52,13 @@ function generateSlug(text) {
 
 export default function NewPost() {
   const router = useRouter();
-  
+
   // Form states for the post details.
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [slug, setSlug] = useState('');
   const [status, setStatus] = useState('draft');
-  // Optional: track selected categories for the post
+  // Optional: track selected categories for the post.
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Fetch all categories to allow assigning them to the post.
@@ -72,7 +73,7 @@ export default function NewPost() {
     setSlug(generateSlug(newTitle));
   };
 
-  // Toggle category selection, if categories are used.
+  // Toggle category selection with a checkbox.
   const handleCategoryChange = (catId) => {
     if (selectedCategories.includes(catId)) {
       setSelectedCategories(selectedCategories.filter((id) => id !== catId));
@@ -102,77 +103,177 @@ export default function NewPost() {
 
   return (
     <Layout>
-      <h1>Create New Post</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title:</label><br />
-          <input
-            type="text"
-            placeholder="Post Title"
-            value={title}
-            onChange={handleTitleChange}
-            required
-            style={{ width: '100%' }}
-          />
-        </div>
-        <div>
-          <label>Slug (auto-generated):</label><br />
-          <input
-            type="text"
-            placeholder="Auto-generated slug"
-            value={slug}
-            readOnly
-            style={{ width: '100%' }}
-          />
-        </div>
-        <div>
-          <label>Content:</label><br />
-          <textarea
-            placeholder="Post content..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            rows={8}
-            style={{ width: '100%' }}
-          />
-        </div>
-        <div>
-          <label>Status:</label><br />
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-        </div>
-        {/* Optional: Categories selection if posts can be categorized */}
-        <div style={{ marginTop: '1rem', border: '1px solid #ccc', padding: '1rem' }}>
-          <h3>Select Categories (optional)</h3>
-          {loadingCats ? (
-            <p>Loading categories...</p>
-          ) : errorCats ? (
-            <p>Error loading categories.</p>
-          ) : (
-            dataCats.categories.map((cat) => (
-              <div key={cat.id}>
-                <label>
+      <div style={styles.card}>
+        <h1 style={styles.heading}>Create New Post</h1>
+        <form onSubmit={handleSubmit}>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Title:</label>
+            <input
+              type="text"
+              placeholder="Post Title"
+              value={title}
+              onChange={handleTitleChange}
+              required
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Slug (auto-generated):</label>
+            <input
+              type="text"
+              placeholder="Auto-generated slug"
+              value={slug}
+              readOnly
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Content:</label>
+            <textarea
+              placeholder="Post content..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              required
+              rows={8}
+              style={styles.textarea}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Status:</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              style={styles.select}
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          {/* Optional: Category Selection */}
+          <div style={{ ...styles.formGroup, ...styles.categoryCard }}>
+            <h3 style={styles.subHeading}>Select Categories (optional)</h3>
+            {loadingCats ? (
+              <p style={styles.smallText}>Loading categories...</p>
+            ) : errorCats ? (
+              <p style={styles.errorText}>Error loading categories.</p>
+            ) : (
+              dataCats.categories.map((cat) => (
+                <div key={cat.id} style={styles.checkboxGroup}>
                   <input
                     type="checkbox"
                     checked={selectedCategories.includes(cat.id)}
                     onChange={() => handleCategoryChange(cat.id)}
+                    style={styles.checkbox}
                   />
-                  {cat.name}
-                </label>
-              </div>
-            ))
-          )}
-        </div>
-        <div style={{ marginTop: '1rem' }}>
-          <button type="submit" disabled={loading}>
-            Create Post
-          </button>
-          {error && <p style={{ color: 'red' }}>Error: {error.message}</p>}
-        </div>
-      </form>
+                  <label style={styles.checkboxLabel}>{cat.name}</label>
+                </div>
+              ))
+            )}
+          </div>
+          <div style={styles.buttonContainer}>
+            <button type="submit" disabled={loading} style={styles.button}>
+              Create Post
+            </button>
+            {error && <p style={styles.errorText}>Error: {error.message}</p>}
+          </div>
+        </form>
+      </div>
     </Layout>
   );
 }
+
+const styles = {
+  card: {
+    maxWidth: "700px",
+    margin: "2rem auto",
+    background: "#fff",
+    padding: "2rem",
+    borderRadius: "8px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  },
+  heading: {
+    fontSize: "2rem",
+    textAlign: "center",
+    marginBottom: "1.5rem",
+    fontWeight: "600",
+    color: "#333",
+  },
+  formGroup: {
+    marginBottom: "1.25rem",
+  },
+  label: {
+    display: "block",
+    marginBottom: "0.5rem",
+    color: "#555",
+    fontSize: "1rem",
+  },
+  input: {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    fontSize: "0.95rem",
+  },
+  textarea: {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    fontSize: "0.95rem",
+    resize: "vertical",
+  },
+  select: {
+    width: "100%",
+    padding: "0.75rem",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    fontSize: "0.95rem",
+    backgroundColor: "#fff",
+  },
+  categoryCard: {
+    border: "1px solid #e0e0e0",
+    padding: "1rem",
+    borderRadius: "4px",
+    backgroundColor: "#f9f9f9",
+  },
+  subHeading: {
+    fontSize: "1.25rem",
+    marginBottom: "1rem",
+    color: "#333",
+  },
+  checkboxGroup: {
+    display: "flex",
+    alignItems: "center",
+    marginBottom: "0.5rem",
+  },
+  checkbox: {
+    marginRight: "0.5rem",
+  },
+  checkboxLabel: {
+    fontSize: "0.95rem",
+    color: "#555",
+  },
+  buttonContainer: {
+    textAlign: "right",
+    marginTop: "1.5rem",
+  },
+  button: {
+    padding: "0.75rem 1.5rem",
+    backgroundColor: "#0070f3",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    fontSize: "1rem",
+    cursor: "pointer",
+  },
+  errorText: {
+    color: "red",
+    marginTop: "1rem",
+    textAlign: "center",
+  },
+  smallText: {
+    fontSize: "0.9rem",
+    color: "#777",
+  },
+};
