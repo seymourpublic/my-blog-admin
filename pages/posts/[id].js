@@ -10,15 +10,13 @@ const GET_POST_BY_ID = gql`
       title
       content
       publishedAt
+      updatedAt
       categories {
         id
         name
       }
       status
-      tags {
-        id
-        name
-      }
+      
     }
   }
 `;
@@ -41,10 +39,10 @@ export default function ViewPost() {
     <Layout>
       <h1>View Post</h1>
       <h2>{post.title}</h2>
-      <p><strong>Published At:</strong> {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : '-'}</p>
+      <p><strong>Published At:</strong> {post.updatedAt ? new Date(post.updatedAt).toLocaleDateString() : '-'}</p>
       <p><strong>Status:</strong> {post.status}</p>
       <p><strong>Category:</strong> {post.categories?.[0]?.name || 'None'}</p>
-      <p><strong>Tags:</strong> {post.tags.map(t => t.name).join(', ')}</p>
+    
       <hr />
       <div>
         <strong>Content:</strong>

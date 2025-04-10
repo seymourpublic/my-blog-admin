@@ -13,6 +13,7 @@ const GET_POSTS = gql`
       title
       publishedAt
       status
+      updatedAt
       categories {
         id
         name

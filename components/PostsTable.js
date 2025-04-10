@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useMutation, gql, useQuery } from '@apollo/client';
 import { useState } from 'react';
 
+// Mutation to delete a post
 const DELETE_POST = gql`
   mutation DeletePost($id: ID!) {
     deletePost(id: $id)
@@ -22,11 +23,34 @@ const UPDATE_POST_CATEGORY = gql`
   }
 `;
 
+// Query to fetch all available categories for the dropdown
 const GET_CATEGORIES = gql`
   query GetCategories {
     categories {
       id
       name
+    }
+  }
+`;
+
+// (Optional) Query to refetch posts after deletion.
+// If your parent page uses a different GET_POSTS query, adjust accordingly.
+const GET_POSTS = gql`
+  query GetPosts($filter: PostFilter) {
+    filteredPosts(filter: $filter) {
+      id
+      title
+      publishedAt
+      updatedAt
+      status
+      categories {
+        id
+        name
+      }
+      tags {
+        id
+        name
+      }
     }
   }
 `;
@@ -44,12 +68,15 @@ export default function PostsTable({
   const { loading: loadingCats, error: errorCats, data: dataCats } =
     useQuery(GET_CATEGORIES);
 
-  // Handle deleting a post
+  // Handle deleting a post using refetchQueries to update UI
   const handleDelete = async (postId) => {
     if (confirm("Are you sure you want to delete this post?")) {
       try {
-        await deletePost({ variables: { id: postId } });
-        // Optionally refetch or update cache here.
+        await deletePost({
+          variables: { id: postId },
+          refetchQueries: [{ query: GET_POSTS }],
+          awaitRefetchQueries: true,
+        });
       } catch (err) {
         console.error("Error deleting post:", err);
       }
@@ -60,7 +87,7 @@ export default function PostsTable({
   const handleCategoryChange = async (postId, categoryId) => {
     try {
       await updatePostCategory({ variables: { postId, categoryId } });
-      // Optionally update local cache or refetch posts.
+      // Optionally refetch or let Apollo cache auto-update
     } catch (err) {
       console.error("Error updating category:", err);
     }
@@ -102,8 +129,8 @@ export default function PostsTable({
               </td>
               <td style={styles.td}>{post.title}</td>
               <td style={styles.td}>
-                {post.publishedAt
-                  ? new Date(post.publishedAt).toLocaleDateString()
+                {post.updatedAt
+                  ? new Date(post.updatedAt).toLocaleDateString()
                   : "-"}
               </td>
               <td style={styles.td}>

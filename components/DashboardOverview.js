@@ -14,6 +14,7 @@ const GET_SUMMARY = gql`
       id
       title
       publishedAt
+      updatedAt
     }
   }
 `;
@@ -67,7 +68,7 @@ export default function DashboardOverview() {
                 <div style={styles.activityInfo}>
                   <h4 style={styles.activityPostTitle}>{post.title}</h4>
                   <p style={styles.activityDate}>
-                    {new Date(post.publishedAt).toLocaleDateString()}
+                    {new Date(post.updatedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>

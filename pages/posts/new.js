@@ -3,6 +3,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import Layout from '../../components/Layout';
+import ImageUploader from '../../components/ImageUploader';
+
+
+
+const handleUploadComplete = (url) => {
+  console.log("Uploaded image URL:", url);
+  setImageUrl(url);
+};
 
 // Query to fetch all available categories (if you want to assign categories to posts)
 const GET_CATEGORIES = gql`
