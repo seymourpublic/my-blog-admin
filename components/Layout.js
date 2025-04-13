@@ -26,7 +26,7 @@ export default function Layout({ children }) {
               fontWeight: 'bold'
             }}
           >
-            VersaBlog
+            VersaBlog Admin
           </div>
           {/* Navigation Links */}
           <nav
