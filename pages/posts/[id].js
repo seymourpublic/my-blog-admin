@@ -16,7 +16,6 @@ const GET_POST_BY_ID = gql`
         name
       }
       status
-      
     }
   }
 `;
@@ -27,13 +26,35 @@ export default function ViewPost() {
 
   const { loading, error, data } = useQuery(GET_POST_BY_ID, {
     variables: { id },
-    skip: !id
+    skip: !id, // Skip query if id is not ready
   });
 
-  if (loading) return <Layout><p>Loading...</p></Layout>;
-  if (error) return <Layout><p>Error loading post.</p></Layout>;
+  if (loading) {
+    return (
+      <Layout>
+        <p>Loading...</p>
+      </Layout>
+    );
+  }
 
-  const post = data.post;
+  if (error) {
+    return (
+      <Layout>
+        <p>Error loading post.</p>
+      </Layout>
+    );
+  }
+
+  const post = data?.post;
+
+  // New safe check
+  if (!post) {
+    return (
+      <Layout>
+        <p>No post found.</p>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
